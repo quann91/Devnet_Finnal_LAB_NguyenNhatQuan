@@ -1,0 +1,55 @@
+---
+- name: Cau hinh tren Router1
+  hosts: R1
+  gather_facts: no
+
+  tasks:
+    - name: Set ip interface
+      ios_l3_interface:
+        name: Ethernet0/{{item.inteface}}
+        ipv4: 192.168.{{item.number}}.{{item.number2}}/24
+      with_items:
+        - {inteface: "1", number: "1", number2: "1"}
+        - {inteface: "2", number: "12", number2: "1"}
+
+    - name: No shut interface
+      ios_interface:
+        name: Ethernet0/{{item.inteface}}
+        enabled: true
+      with_items:
+        - {inteface: "1"}
+        - {inteface: "2"}
+
+    - name: configure static route
+      ios_static_route:
+        prefix: 192.168.2.0
+        mask: 255.255.255.0
+        next_hop: 192.168.12.2
+
+- name: Cau hinh tren Router2
+  hosts: R2
+  gather_facts: no
+
+  tasks:
+    - name: Set ip interface
+      ios_l3_interface:
+        name: Ethernet0/{{item.inteface}}
+        ipv4: 192.168.{{item.number}}.{{item.number2}}/24
+      with_items:
+        - {inteface: "1", number: "2", number2: "1"}
+        - {inteface: "2", number: "12", number2: "2"}
+
+    - name: No shut interface
+      ios_interface:
+        name: Ethernet0/{{item.inteface}}
+        enabled: true
+      with_items:
+        - {inteface: "1"}
+        - {inteface: "2"}
+
+    - name: configure static route
+      ios_static_route:
+        prefix: 192.168.1.0
+        mask: 255.255.255.0
+        next_hop: 192.168.12.1
+               
